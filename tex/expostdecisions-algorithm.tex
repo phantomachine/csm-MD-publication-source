@@ -1,0 +1,29 @@
+\begin{algorithmic}[1]
+	\Require{
+		$\omega$,
+	 	% Value functions
+		$(B,W) \gets \mathbf{v}$,
+    % Policies
+    $\left(b^{\star}, x^{\star}, y^{\star}\right) \gets \mathbf{p}$
+	}
+	%%%%%%%%% Cut out %%%%%%%%%%%%%%
+	% Make binary choice
+	\If{$W(m,\omega) \geq B(m,\omega)$}
+		\State{$m' \gets y^{\star}(m,\omega)$}
+	\Else
+		% Go to DM and check Matching, or not?
+		\State{Get $u \sim \mathbf{U}[0,1]$}
+		\If{$u \in [0, b^{\star}(m,\omega)]$}
+		\State{Get $x^{\star}(m,\omega) > 0$}
+		\State{Get $b^{\star}(m,\omega) > 0$}
+			\State{$m' \gets m - x^{\star}(m,\omega)$}
+		\Else
+			\State{$x^{\star}(m,\omega) \gets 0$}
+			\State{$b^{\star}(m,\omega) \gets 0$}
+			\State{$m' \gets m$}
+		\EndIf
+	\EndIf
+	%
+
+	\Return{$m'$}
+\end{algorithmic}

@@ -1,0 +1,80 @@
+\begin{algorithmic}[1]
+
+	\Require{
+		$\alpha \in [0,1)$,
+		$\omega>0$,
+		$\bar{V}(\cdot,\omega) \in \mathcal{V}\left[0,\bar{m}\right]$,
+		$N_{\max} > 0$
+	}
+	%%%%%%%%% Cut out %%%%%%%%%%%%%%
+	% Make binary choice
+	\For{$n \leq N_{\max}$}
+			% Solve CM problem
+			\State{
+				$\left(W^{\star}, \bar{C}^{\star}, l^{\star}, y^{\star}\right)
+			 	\gets
+				\texttt{WorkerProblem}(\bar{V}, \omega)$
+			}
+
+			% Solve DM problem
+			\State{
+				$\left(B^{\star}, b^{\star}, x^{\star}, q^{\star}\right)
+				\gets
+				\texttt{BuyerProblem}(\bar{V}, \omega)$
+			}
+
+			% Ex-post
+			\State{
+				$\tilde{V}
+				\gets
+				\max\left\{B^{\star}(\cdot,\omega), W^{\star}(\cdot,\omega)\right\}$
+			}
+
+			% Ex-ante
+			\State{
+				$\left( V^{\star}, \left\{ z^{\star,j}, \pi^{\star, j} \right\}_{j \in J}\right)
+				\gets \texttt{ConvexHull}\left[\text{graph}\left(\tilde{V}\right)\right]$
+			}
+
+			% Vbar
+			\State{
+				$\bar{V}^{\star}
+				\gets
+				\alpha W^{\star} + (1-\alpha) V^{\star}$
+			}
+			% Pack Value functions
+			\State{$\mathbf{v} \gets (\bar{V},B,W)$}
+	    % Policies
+			\State{
+					$\mathbf{p} \gets
+						\langle
+						\{
+						\pi_{1}^{j,\star},
+							z_{1}^{j,\star},
+							z_{2}^{j,\star}
+						\} _{j\in J},
+				    (b^{\star}, x^{\star}, y^{\star}, \bar{C}^{\star})
+						\rangle $
+			}
+			% Distribution
+			\State{$G \gets \texttt{Distribution}(\mathbf{p}, \mathbf{v})$}
+			% Market clearing
+			\State{$\omega^{\star} \gets \texttt{MarketClearing}(G)$}
+
+			% Convergence checks
+			\State{
+					$e \gets \max \left\{
+														\|\bar{V}^{\star}-\bar{V}\|,
+														\|\omega^{\star}-\omega \|
+											\right\}$
+			}
+			\If{$e < \varepsilon$}
+				\State{STOP}
+			\Else
+				\State{$(\bar{V},\omega) \gets (\bar{V}^{\star},\omega^{\star})$}
+				\State{CONTINUE}
+			\EndIf
+	\EndFor
+
+	\Return{$\mathbf{p}, \mathbf{v}, G, \omega^{\star}$}
+\end{algorithmic}

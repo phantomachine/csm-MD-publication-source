@@ -1,0 +1,74 @@
+\begin{algorithmic}[1]
+	\Require{
+		% Value functions
+		$\mathbf{v} \gets (\bar{V},B,W)$,
+    % Policies
+		$\mathbf{p} \gets
+		\langle
+		\{
+		\pi_{1}^{j,\star},
+			z_{1}^{j,\star},
+			z_{2}^{j,\star}
+		\} _{j\in J},
+    (b^{\star}, x^{\star}, y^{\star})
+		\rangle $,
+		% Settings
+		$T$,
+		$\omega$,
+		$\phi(m,\omega) \gets \frac{m + \tau}{(1+\tau\omega)(1-\delta)}$
+	}
+	% Predefine object M:
+	\State{Set $\mathbf{M} \gets \texttt{EmptyList}[\ ]$ }
+	% Get initial state for agent (end of CM):
+	%\State{Get $y^{\star}(0,\omega)$ }
+	\State{$m \gets y^{\star}(0,\omega)$ }
+	% Loop over simulation path
+	\For{$t \leq T$}
+		% Check if end-of-date balance is zero
+		\If{$m = 0$}
+			\State{$m \gets \phi(m,\omega)$}
+			\State{$m' \gets y^{\star}(m-\chi,\omega)$ }
+		% Check if end-of-date balance is NOT zero
+		\Else
+			% Initial money growth transfer
+			\State{$m \gets \phi(m,\omega)$}
+			%%%% Given m (lottery outcome), evaluate ExPostDecisions()
+			%%%% \State{$m' \gets \texttt{ExPostDecisions}(m, \omega, \mathbf{p}, \mathbf{v})$}
+			% Define Problem:
+			\State{Get $u \sim \mathbf{U}[0,1]$}
+				\If{$u \in [0, \alpha]$}
+					% Go to CM again this period for sure
+					\State{$m' \gets y^{\star}(m,\omega)$}
+				\Else
+				% Lottery at m?
+					\If{$\exists j \in J$ and
+						$m \in \left[
+							z_{1}^{j,\star}(m,\omega),
+							z_{2}^{j,\star}(m,\omega)
+						\right]$
+					}
+						\State{Get $u \sim \mathbf{U}[0,1]$}
+						\If{$u \in
+							\left[
+							0, \pi_{1}^{j,\star}(m,\omega)
+							\right]$
+						}
+							\State{$m \gets z_{1}^{j,\star}\left(m,\omega\right)$}
+						\Else
+							\State{$m \gets z_{2}^{j,\star}\left(m,\omega\right)$}
+						\EndIf
+						% Given m (lottery outcome), eval ExPostDecisions()
+						\State{$m' \gets \texttt{ExPostDecisions}(m,\omega, \mathbf{p}, \mathbf{v})$}
+					\Else
+						% Given m (NO lottery outcome), eval ExPostDecisions()
+						\State{$m' \gets \texttt{ExPostDecisions}(m,\omega, \mathbf{p}, \mathbf{v})$}
+					\EndIf
+				\EndIf
+		\EndIf
+		\State{$\mathbf{M}.\texttt{append}(m')$}
+		\State{Set $m \gets m'$}
+	\EndFor
+	%
+
+	\Return{$\mathbf{M}$}
+\end{algorithmic}
